@@ -6,6 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Attendance Manager</title>
 
+	<link rel="stylesheet" href="css/themes/my-custom-theme.css" />
+    <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />	
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
@@ -17,12 +19,39 @@
 <div data-role="page" id="one">
 	<div role="main" class="ui-content">
 	<div data-role="header">
-		<h1>Attendance Manager</h1>		
+		<h1>Attendance Manager</h1>        		
 	</div><!-- /header -->
+	
 	<h1>Attendance Manager</h1>
+	    <h2>Login</h2>
+	    Username <input type="text" name="username" id="username" value="">
+        Password <input type="password" name="pass" id="pass" value="">
+        <button class="ui-btn" id="loginButton">Submit</button>
 	</div><!-- /content -->
 </div><!-- /page one -->
 
-
+<div data-role="page" id="dashboard">
+	<div role="main" class="ui-content">
+	<div data-role="header">
+		<h1>Dashboard</h1>        		
+	</div><!-- /header -->
+	
+	Test
+	</div><!-- /content -->
+</div><!-- /page one -->
+<script>
+$( "#loginButton" ).click(function() {
+    var uname = $( "#username" ).val();    
+      
+    var pw = $( "#pass" ).val();      
+      
+    $.post( "/functions", { type: "login", username:uname, password:pw})
+    .done(function( data ) {        
+        alert.(data);
+        window.location="/index#dashboard";
+        
+    });  
+});
+</script>
 </body>
 </html>
