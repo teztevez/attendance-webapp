@@ -22,6 +22,7 @@ class Functions extends AbstractController
 		
 		$type = $request->request->get('type', 'none');
 		
+		//login function
 		if($type == 'login') {
 				//get username and password
 			$username = $request->request->get('username', 'none');
@@ -31,7 +32,32 @@ class Functions extends AbstractController
 			
 			$admin = $repo->findOneBy(['username' => $username, 'password' => $password]);			
 			
-			return new Response("Welcome " $admin->getUsername());	
+			return new Response("Welcome " .$admin->getUsername());	
+		}
+		
+		else if($type == 'allClock') {
+			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+			$all = $repo->findAll();
+			
+			$table = "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Time</th>";
+			
+			foreach($all as $row) {
+				$time = $row->getTime();
+				$date_str = $time->format('d/m/Y');
+				$time_str = $time->format('H:i:s');
+				
+				$table .= "<tr>";
+				$table .= "<td>".$date_str."</td>";
+				$table .= "<td>".$row->getEmpId()."</td>";
+				$table .= "<td>".$row->getDirection()." - ".$time_str."</td>";
+				$table .= "</tr>";
+			}
+			
+			$table .= "</tbody></table>";
+			
+			return new Response($table);	
+		}
+				
 	}
 }
 ?>

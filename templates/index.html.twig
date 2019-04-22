@@ -5,9 +5,15 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Attendance Manager</title>
-
-	<link rel="stylesheet" href="css/themes/my-custom-theme.css" />
-    <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />	
+    <style> table {
+	border: 1px solid;
+	}
+	
+	tr, td, th {
+	border: 1px solid;
+	padding: .5em;
+	}
+	</style>
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
@@ -36,10 +42,28 @@
 		<h1>Dashboard</h1>        		
 	</div><!-- /header -->
 	
-	Test
+    <fieldset class="ui-grid-a">
+	<div class="ui-block-a"><button type="button" id="allClock" data-theme="a">All Clocking Data</button></div>
+	<div class="ui-block-b"><button type="button" data-theme="a">Today's Clocking Data</button></div>	   
+    </fieldset>
+	
+	</div><!-- /content -->
+</div><!-- /page one -->
+
+<div data-role="page" id="viewAll">
+	<div role="main" class="ui-content">
+	<div data-role="header">
+		<h1>View All Clockings</h1>        		
+	</div><!-- /header -->
+	
+	<div id="viewAllClocks">
+	
+	</div>
+	
 	</div><!-- /content -->
 </div><!-- /page one -->
 <script>
+//login function
 $( "#loginButton" ).click(function() {
     var uname = $( "#username" ).val();    
       
@@ -47,11 +71,21 @@ $( "#loginButton" ).click(function() {
       
     $.post( "/functions", { type: "login", username:uname, password:pw})
     .done(function( data ) {        
-        alert.(data);
+        alert(data);
         window.location="/index#dashboard";
         
     });  
 });
+
+//view all clocking data
+$( "#allClock" ).click(function() {      
+    $.post( "/functions", { type: "allClock"})
+    .done(function( data ) {      
+		window.location="/index#viewAll";
+		$( "#viewAllClocks" ).html(data);	
+    });  
+});
+
 </script>
 </body>
 </html>
