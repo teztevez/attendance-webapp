@@ -35,6 +35,7 @@ class Functions extends AbstractController
 			return new Response("Welcome " .$admin->getUsername());	
 		}
 		
+		//return raw data in table for all registered clocks
 		else if($type == 'allClock') {
 			$repo = $this->getDoctrine()->getRepository(Clockings::class);
 			$all = $repo->findAll();
@@ -57,6 +58,36 @@ class Functions extends AbstractController
 			
 			return new Response($table);	
 		}
+		
+		//select today's clocks
+		else if($type == 'today') {
+			$date = date("d/m/Y"); //today's date
+			
+			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+			$today = $repo->findAll();
+			
+			$table = "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Time</th>";
+			
+			foreach($today as $row) {
+				$time = $row->getTime();
+				$date_str = $time->format('d/m/Y');
+				$time_str = $time->format('H:i:s');
+				
+				if($date == $date_str) {
+				
+				    $table .= "<tr>";
+				    $table .= "<td>".$date_str."</td>";
+				    $table .= "<td>".$row->getEmpId()."</td>";
+				    $table .= "<td>".$row->getDirection()." - ".$time_str."</td>";
+				    $table .= "</tr>";
+				}
+			}
+			
+			$table .= "</tbody></table>";
+			
+			return new Response($table);	
+		}
+			
 				
 	}
 }

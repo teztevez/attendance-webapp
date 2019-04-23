@@ -44,7 +44,7 @@
 	
     <fieldset class="ui-grid-a">
 	<div class="ui-block-a"><button type="button" id="allClock" data-theme="a">All Clocking Data</button></div>
-	<div class="ui-block-b"><button type="button" data-theme="a">Today's Clocking Data</button></div>	   
+	<div class="ui-block-b"><button type="button" id="today" data-theme="a">Today's Clocking Data</button></div>	   
     </fieldset>
 	
 	</div><!-- /content -->
@@ -56,7 +56,7 @@
 		<h1>View All Clockings</h1>        		
 	</div><!-- /header -->
 	
-	<div id="viewAllClocks">
+	<div id="viewTable">
 	
 	</div>
 	
@@ -82,7 +82,16 @@ $( "#allClock" ).click(function() {
     $.post( "/functions", { type: "allClock"})
     .done(function( data ) {      
 		window.location="/index#viewAll";
-		$( "#viewAllClocks" ).html(data);	
+		$( "#viewTable" ).html(data);	
+    });  
+});
+
+//view today's clocking data
+$( "#today" ).click(function() {      
+    $.post( "/functions", { type: "today"})
+    .done(function( data ) {      
+		window.location="/index#viewAll";
+		$( "#viewTable" ).html(data);	
     });  
 });
 
