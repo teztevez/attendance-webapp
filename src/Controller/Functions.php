@@ -86,127 +86,16 @@ class Functions extends AbstractController
 			$table .= "</tbody></table>";
 			
 			return new Response($table);	
-		}
-		
-		else if($type == 'MOST RECENT') {
-			$date = date("d/m/Y"); //today's date
-			
-			$repo = $this->getDoctrine()->getRepository(Clockings::class);
-			$today = $repo->findAll();
-			
-			$table = "<table><thead><tr><th>Employee</th><th>Department</th>";
-			
-			foreach($today as $row) {
-				$time = $row->getTime();
-				$date_str = $time->format('d/m/Y');
-				
-				if($date == $date_str) {
-					if($row->getDirection() == "in") {
-						$id =$row->getEmpId();
-						foreach($today as $row2) {
-							$time = $row2->getTime();
-							$date_str = $time->format('d/m/Y');
-							if($date == $date_str) {
-								if($row2->getEmpId() == $id) {          
-								    if($row2->getEmpId() == $id && $row2->getDirection() == 'out') {
-										continue;
-									}
-									else {
-										$table .= "<tr>";
-									
-										$table .= "<td>".$row->getEmpId()."</td>";
-										
-										$table .= "</tr>";
-									}
-								}
-				                
-								
-								
-							}
-						}
-					}
-				}
-			}
-			
-			$table .= "</tbody></table>";
-			
-			return new Response($table);	
-		}	
-
-		else if($type == '') {
-			$date = date("d/m/Y"); //today's date
-			
-			$repo = $this->getDoctrine()->getRepository(Clockings::class);
-			$today = $repo->findAll();
-			
-			$table = "<table><thead><tr><th>Employee</th><th>Department</th>";
-			
-			$length = 0;
-			foreach($today as $row) {
-				
-				    $length++;
-				
-			}
-			
-			for($x=0; $x < $length; $x++) {
-				$time = $today[$x]->getTime();
-				$date_str = $time->format('d/m/Y');				
-				if($date == $date_str) {
-					if($today[$x]->getDirection() == 'in') {
-						$emp = $today[$x]->getEmpId();
-						for($x=0; $x < $length; $x++) {
-							if($date == $date_str) {
-								if($today[$x]->getDirection() == 'out') {
-									if($today[$x]->getEmpId() == $emp) {
-										continue;
-									}
-									else {
-										$table.= "<tr>";
-										$table.="<td>".$today[$x]->getEmpId()."</td>";
-										$table.="</tr>";
-									}
-								}
-							}
-						}
-					}
-				}									
-			}
-			
-			$table .= "</tbody></table>";
-			
-			return new Response($table);	
-		}
-		
-		else if($type == '') {
-			$date = date("d/m/Y"); //today's date
-			
-			$repo = $this->getDoctrine()->getRepository(Clockings::class);
-			$today = $repo->findAll();
-			
-			$table = "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Time</th>";
-			
-			foreach($today as $row) {
-				$time = $row->getTime(); //gets the value for 'time' in database
-				$date_str = $time->format('d/m/Y'); //creates variable using only date part of the $time variable
-				$time_str = $time->format('H:i:s'); //creates variable using only the time part of the $time variable
-				
-				if($date == $date_str) {				
-				    
-				}
-			}
-			
-			$table .= "</tbody></table>";
-			
-			return new Response($table);	
-		}
+		}		
 		
 		else if($type == 'onsite') {
 			$date = date("d/m/Y"); //today's date
 			
 			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+			$empRepo = $this->getDoctrine()->getRepository(Employee::class);
 			$today = $repo->findAll();
 			
-			$table = "<table><thead><tr><th>Employee</th><th>Department</th>";
+			$table = "<table><thead><tr><th>Employee #</th><th>Name</th><th>Department</th>";
 			
 			foreach($today as $row) {
 				$time = $row->getTime();
@@ -220,8 +109,11 @@ class Functions extends AbstractController
 							continue;
 						}
 						else {
+							$emp = $empRepo->findOneBy(['id' => $id]);
 							$table.= "<tr>";
-							$table.="<td>".$row->getEmpId()."</td>";
+							$table.="<td>".$id."</td>";
+							$table.="<td>".$emp->getFname()." ".$emp->getLname()."</td>";
+							$table.="<td>".$emp->getDept()."</td>";
 							$table.="</tr>";
 						}
 						
