@@ -47,6 +47,11 @@
 	<div class="ui-block-b"><button type="button" id="today" data-theme="a">Today's Clocking Data</button></div>	   
     </fieldset>
 	
+	<fieldset class="ui-grid-a">
+	<div class="ui-block-a"><button type="button" id="onsite" data-theme="a">Onsite Report</button></div>
+	<div class="ui-block-b"><button type="button" id="today" data-theme="a">Today's Clocking Data</button></div>	   
+    </fieldset>
+	
 	</div><!-- /content -->
 </div><!-- /page one -->
 
@@ -91,6 +96,16 @@ $( "#today" ).click(function() {
     $.post( "/functions", { type: "today"})
     .done(function( data ) {      
 		window.location="/index#viewAll";
+		console.log(data);
+		$( "#viewTable" ).html(data);	
+    });  
+});
+
+$( "#onsite" ).click(function() {      
+    $.post( "/functions", { type: "onsite"})
+    .done(function( data ) {      
+		window.location="/index#viewAll";
+		console.log(data);
 		$( "#viewTable" ).html(data);	
     });  
 });
