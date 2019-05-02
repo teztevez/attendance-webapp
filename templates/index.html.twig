@@ -14,9 +14,10 @@
 	padding: .5em;
 	}
 	</style>
+	<link rel="stylesheet" type="text/css" href="css/custom.css"/>
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>	
 </head>
 
 <body>
@@ -41,7 +42,8 @@
 	<div data-role="header">
 		<h1>Dashboard</h1>        		
 	</div><!-- /header -->
-	
+	<h5 id="date"></h5>
+
     <fieldset class="ui-grid-a">
 	<div class="ui-block-a"><button type="button" id="allClock" data-theme="a">All Clocking Data</button></div>
 	<div class="ui-block-b"><button type="button" id="today" data-theme="a">Today's Clocking Data</button></div>	   
@@ -49,7 +51,7 @@
 	
 	<fieldset class="ui-grid-a">
 	<div class="ui-block-a"><button type="button" id="onsite" data-theme="a">Onsite Report</button></div>
-	<div class="ui-block-b"><button type="button" id="today" data-theme="a">Today's Clocking Data</button></div>	   
+	<div class="ui-block-b"><button type="button" id="otherdate" data-theme="a">View Data for Specific Date</button></div>	   
     </fieldset>
 	
 	</div><!-- /content -->
@@ -58,10 +60,30 @@
 <div data-role="page" id="viewAll">
 	<div role="main" class="ui-content">
 	<div data-role="header">
-		<h1>View All Clockings</h1>        		
+		<h1>View</h1>        		
 	</div><!-- /header -->
 	
 	<div id="viewTable">
+	
+	</div>
+	
+	</div><!-- /content -->
+</div><!-- /page one -->
+
+<div data-role="page" id="datePick">
+	<div role="main" class="ui-content">
+	<div data-role="header">
+		<h1>Select Date</h1>        		
+	</div><!-- /header -->
+	<form>
+        <label for="date-1">Select Date:</label>
+        <input type="date" data-clear-btn="false" name="date-1" id="date-1" value=""> 
+		<div class="ui-block-a"><button type="button" id="viewDate" data-theme="a">View All Data</button></div>
+		<div class="ui-block-b"><button type="button" id="viewLate" data-theme="a">View Late Arrivals</button></div>
+		<div class="ui-block-c"><button type="button" id="viewEarly" data-theme="a">View Early Leavers</button></div>
+    </form>
+	<br><br>
+	<div id="viewSpecified">
 	
 	</div>
 	
@@ -109,6 +131,39 @@ $( "#onsite" ).click(function() {
 		$( "#viewTable" ).html(data);	
     });  
 });
+
+$( "#otherdate" ).click(function() {       
+	window.location="/index#datePick";	    
+});	
+
+$( "#viewDate" ).click(function() {      
+    var d = $( "#date-1" ).val();
+     $.post( "/functions", { type: "selectDate", date: d})   
+		.done(function( data ) {
+		//window.location="/index#viewAll";
+		$( "#viewSpecified" ).html(data);	
+	});	
+});
+
+$( "#viewLate" ).click(function() {      
+    var d = $( "#date-1" ).val();
+     $.post( "/functions", { type: "selectLate", date: d})   
+		.done(function( data ) {		
+		$( "#viewSpecified" ).html(data);	
+	});	
+});
+
+$( "#viewEarly" ).click(function() {      
+    var d = $( "#date-1" ).val();
+     $.post( "/functions", { type: "selectEarly", date: d})   
+		.done(function( data ) {		
+		$( "#viewSpecified" ).html(data);	
+	});	
+});
+	
+var date = Date();
+document.getElementById("date").innerHTML = date;
+
 
 </script>
 </body>

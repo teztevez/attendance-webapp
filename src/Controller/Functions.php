@@ -40,7 +40,8 @@ class Functions extends AbstractController
 			$repo = $this->getDoctrine()->getRepository(Clockings::class);
 			$all = $repo->findAll();
 			
-			$table = "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Time</th>";
+			$table = "<h2>Full Clocking History</h2><br>";
+			$table .= "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Time</th>";
 			
 			foreach($all as $row) {
 				$time = $row->getTime();
@@ -66,7 +67,8 @@ class Functions extends AbstractController
 			$repo = $this->getDoctrine()->getRepository(Clockings::class);
 			$today = $repo->findAll();
 			
-			$table = "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Time</th>";
+			$table = "<h2>Today's Clocks</h2><br>";
+			$table .= "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Direction</th><th>Time</th>";
 			
 			foreach($today as $row) {
 				$time = $row->getTime(); //gets the value for 'time' in database
@@ -78,7 +80,8 @@ class Functions extends AbstractController
 				    $table .= "<tr>";
 				    $table .= "<td>".$date_str."</td>";
 				    $table .= "<td>".$row->getEmpId()."</td>";
-				    $table .= "<td>".$row->getDirection()." - ".$time_str."</td>";
+				    $table .= "<td>".$row->getDirection()."</td>";
+					$table .= "<td>".$time_str."</td>";
 				    $table .= "</tr>";
 				}
 			}
@@ -95,17 +98,19 @@ class Functions extends AbstractController
 			$empRepo = $this->getDoctrine()->getRepository(Employee::class);
 			$today = $repo->findAll();
 			
-			$table = "<table><thead><tr><th>Employee #</th><th>Name</th><th>Department</th>";
+			$table = "<h2>Current Employees Onsite</h2><br>";
+			$table .= "<table><thead><tr><th>Employee #</th><th>Name</th><th>Department</th>";
 			
 			foreach($today as $row) {
 				$time = $row->getTime();
 				$date_str = $time->format('d/m/Y');
 				
+				
 				if($date == $date_str) {
 					if($row->getDirection() == "in") {
 						$id =$row->getEmpId();
 						
-						if($this->haveLeft($id) == true) {
+						if($this->haveLeft($id) == true) {							
 							continue;
 						}
 						else {
@@ -123,10 +128,105 @@ class Functions extends AbstractController
 			
 			$table .= "</tbody></table>";
 			
-			return new Response($table);	
-		}	
+			
+			return new Response($table);
+							
+		}		
+	
+	    else if($type == 'selectDate') {
+			$date = $request->request->get('date', 'none');
+			
+			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+			$result = $repo->findAll();
+			
+			$table = "<h2>Clocking Data for ".$date."</h2><br>";
+			$table .= "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Direction</th><th>Time</th>";
+			
+			foreach($result as $row) {	
+				$time = $row->getTime();			
+				$date_str = $time->format('Y-m-d'); //creates variable using only date part of the $time variable
+				$time_str = $time->format('H:i:s'); //creates variable using only the time part of the $time variable
 				
-	}
+				if($date == $date_str) {
+				
+				    $table .= "<tr>";
+				    $table .= "<td>".$date_str."</td>";
+				    $table .= "<td>".$row->getEmpId()."</td>";
+				    $table .= "<td>".$row->getDirection()."</td>";
+					$table .= "<td>".$time_str."</td>";
+				    $table .= "</tr>";
+				}
+			}
+			
+			$table .= "</tbody></table>";
+			
+			return new Response($table);	
+		}
+		
+		else if($type == 'selectLate') {
+			$date = $request->request->get('date', 'none');
+			
+			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+			$result = $repo->findAll();
+			
+			$table = "<h2>Clocking Data for ".$date."</h2><br>";
+			$table .= "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Direction</th><th>Time</th>";
+			
+			foreach($result as $row) {	
+				$time = $row->getTime();			
+				$date_str = $time->format('Y-m-d'); //creates variable using only date part of the $time variable
+				$time_str = $time->format('H:i:s'); //creates variable using only the time part of the $time variable
+				
+				if($date == $date_str) {
+					if($row->getDirection() == "in" && $row->getPunctual() == "no") {
+				
+				        $table .= "<tr>";
+				        $table .= "<td>".$date_str."</td>";
+				        $table .= "<td>".$row->getEmpId()."</td>";
+				        $table .= "<td>".$row->getDirection()."</td>";
+					    $table .= "<td>".$time_str."</td>";
+				        $table .= "</tr>";
+				    }
+				}
+			}
+			
+			$table .= "</tbody></table>";
+			
+			return new Response($table);	
+		}
+		
+		else if($type == 'selectEarly') {
+			$date = $request->request->get('date', 'none');
+			
+			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+			$result = $repo->findAll();
+			
+			$table = "<h2>Clocking Data for ".$date."</h2><br>";
+			$table .= "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Direction</th><th>Time</th>";
+			
+			foreach($result as $row) {	
+				$time = $row->getTime();			
+				$date_str = $time->format('Y-m-d'); //creates variable using only date part of the $time variable
+				$time_str = $time->format('H:i:s'); //creates variable using only the time part of the $time variable
+				
+				if($date == $date_str) {
+					if($row->getDirection() == "out" && $row->getPunctual() == "no") {
+				
+				        $table .= "<tr>";
+				        $table .= "<td>".$date_str."</td>";
+				        $table .= "<td>".$row->getEmpId()."</td>";
+				        $table .= "<td>".$row->getDirection()."</td>";
+					    $table .= "<td>".$time_str."</td>";
+				        $table .= "</tr>";
+				    }
+				}
+			}
+			
+			$table .= "</tbody></table>";
+			
+			return new Response($table);	
+		}
+	}		
 	
 	public function haveLeft($id) {	
 		$date = date("d/m/Y"); //today's date
