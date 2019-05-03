@@ -25,9 +25,6 @@
 <!-- Start of first page: #one -->
 <div data-role="page" id="one">
 	<div role="main" class="ui-content">
-	<div data-role="header">
-		<h1>Attendance Manager</h1>        		
-	</div><!-- /header -->
 	
 	<h1>Attendance Manager</h1>
 	    <h2>Login</h2>
@@ -39,9 +36,7 @@
 
 <div data-role="page" id="dashboard">
 	<div role="main" class="ui-content">
-	<div data-role="header">
-		<h1>Dashboard</h1>        		
-	</div><!-- /header -->
+	<h1>Dashboard</h1>  
 	<h5 id="date"></h5>
 
     <fieldset class="ui-grid-a">
@@ -54,15 +49,17 @@
 	<div class="ui-block-b"><button type="button" id="otherdate" data-theme="a">View Data for Specific Date</button></div>	   
     </fieldset>
 	
+	<fieldset class="ui-grid-a">
+	<div class="ui-block-a"><button type="button" id="create" data-theme="a">Add New Employee</button></div>
+	<div class="ui-block-b"><button type="button" id="update" data-theme="a">Update Records</button></div>	   
+    </fieldset>
+	
 	</div><!-- /content -->
 </div><!-- /page one -->
 
 <div data-role="page" id="viewAll">
 	<div role="main" class="ui-content">
-	<div data-role="header">
-		<h1>View</h1>        		
-	</div><!-- /header -->
-	
+		
 	<div id="viewTable">
 	
 	</div>
@@ -72,9 +69,8 @@
 
 <div data-role="page" id="datePick">
 	<div role="main" class="ui-content">
-	<div data-role="header">
-		<h1>Select Date</h1>        		
-	</div><!-- /header -->
+	<h2>Date Viewer</h2>  
+	
 	<form>
         <label for="date-1">Select Date:</label>
         <input type="date" data-clear-btn="false" name="date-1" id="date-1" value=""> 
@@ -86,6 +82,60 @@
 	<div id="viewSpecified">
 	
 	</div>
+	
+	</div><!-- /content -->
+</div><!-- /page one -->
+
+<div data-role="page" id="addNew">
+	<div role="main" class="ui-content">
+	<h2>Add New Employee</h2>  
+	
+	    First Name: <input type="text" name="fname" id="fname" value="">
+        Last Name: <input type="text" name="lname" id="lname" value="">
+	      <form>
+        <fieldset data-role="controlgroup" data-type="horizontal">
+        <legend>Department:</legend>
+        <input type="radio" name="dept" id="dept1" value="IT" checked="checked">
+        <label for="dept1">IT</label>
+        <input type="radio" name="dept" id="dept2" value="Logistics">
+        <label for="dept2">Logistics</label>
+        <input type="radio" name="dept" id="dept3" value="Finance">
+        <label for="dept3">Finance</label>
+		<input type="radio" name="dept" id="dept4" value="Automation">
+        <label for="dept4">Automation</label>
+		<input type="radio" name="dept" id="dept5" value="Supply Management">
+        <label for="dept5">Supply Management</label>
+		<input type="radio" name="dept" id="dept6" value="Order Management">
+        <label for="dept6">Order Management</label>
+		<input type="radio" name="dept" id="dept7" value="Engineering">
+        <label for="dept7">Engineering</label>
+		<input type="radio" name="dept" id="dept8" value="Quality">
+        <label for="dept8">Quality</label>
+		<input type="radio" name="dept" id="dept9" value="Purchasing">
+        <label for="dept9">Purchasing</label>
+		<input type="radio" name="dept" id="dept10" value="HR">
+        <label for="dept10">HR</label>
+   		</fieldset>
+		</form>
+        <button class="ui-btn" id="submitEmp">Submit</button>
+	
+	</div><!-- /content -->
+</div><!-- /page one -->
+
+<div data-role="page" id="updateRecords">
+	<div role="main" class="ui-content">
+	<h2>Update Time Records:</h2>  
+	
+	<form>        
+		<button type="button" id="showRecords" data-theme="a">View Flagged Records</button>
+		<button type="button" id="showUnknown" data-theme="a">Rectify Unknown Records</button>		
+    </form>
+	<br><br>
+	<div id="viewAnomolies">
+	
+	</div>
+	
+	    
 	
 	</div><!-- /content -->
 </div><!-- /page one -->
@@ -117,8 +167,7 @@ $( "#allClock" ).click(function() {
 $( "#today" ).click(function() {      
     $.post( "/functions", { type: "today"})
     .done(function( data ) {      
-		window.location="/index#viewAll";
-		console.log(data);
+		window.location="/index#viewAll";		
 		$( "#viewTable" ).html(data);	
     });  
 });
@@ -126,8 +175,7 @@ $( "#today" ).click(function() {
 $( "#onsite" ).click(function() {      
     $.post( "/functions", { type: "onsite"})
     .done(function( data ) {      
-		window.location="/index#viewAll";
-		console.log(data);
+		window.location="/index#viewAll";		
 		$( "#viewTable" ).html(data);	
     });  
 });
@@ -139,8 +187,7 @@ $( "#otherdate" ).click(function() {
 $( "#viewDate" ).click(function() {      
     var d = $( "#date-1" ).val();
      $.post( "/functions", { type: "selectDate", date: d})   
-		.done(function( data ) {
-		//window.location="/index#viewAll";
+		.done(function( data ) {		
 		$( "#viewSpecified" ).html(data);	
 	});	
 });
@@ -160,6 +207,44 @@ $( "#viewEarly" ).click(function() {
 		$( "#viewSpecified" ).html(data);	
 	});	
 });
+
+$( "#create" ).click(function() {       
+	window.location="/index#addNew";	    
+});	
+
+$( "#submitEmp" ).click(function() { 
+    var fn = $( "#fname" ).val(); 
+      
+    var ln = $( "#lname" ).val();
+	
+    var dept = $( "input[name=dept]:checked" ).val(); //grabs value of checked radio button
+      
+	$.post( "/functions", { type: "create", fname:fn, lname:ln, dept:dept})
+    .done(function( data ) {
+        alert(data);	
+		location.reload();
+    });
+});
+
+$( "#update" ).click(function() {       
+	window.location="/index#updateRecords";	    
+});	
+
+$( "#showRecords" ).click(function() {   
+    $.post( "/functions", { type: "update"})
+    .done(function( data ) {	
+    $( "#viewAnomolies" ).html(data);	
+	});
+});
+
+$( "#showUnknown" ).click(function() {   
+    $.post( "/functions", { type: "updateUnknown"})
+    .done(function( data ) {	
+    $( "#viewAnomolies" ).html(data);	
+	});
+});
+
+showUnknown
 	
 var date = Date();
 document.getElementById("date").innerHTML = date;

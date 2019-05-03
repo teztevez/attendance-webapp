@@ -167,12 +167,15 @@ class Functions extends AbstractController
 			$date = $request->request->get('date', 'none');
 			
 			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+			$empRepo = $this->getDoctrine()->getRepository(Employee::class);
 			$result = $repo->findAll();
 			
-			$table = "<h2>Clocking Data for ".$date."</h2><br>";
-			$table .= "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Direction</th><th>Time</th>";
+			$table = "<h2>Late Arrivals on ".$date."</h2><br>";
+			$table .= "<table><thead><tr><th>Employee ID</th><th>Name</th><th>Time</th>";
 			
 			foreach($result as $row) {	
+			    $id = $row->getEmpId();
+			    $emp = $empRepo->findOneBy(['id' => $id]);
 				$time = $row->getTime();			
 				$date_str = $time->format('Y-m-d'); //creates variable using only date part of the $time variable
 				$time_str = $time->format('H:i:s'); //creates variable using only the time part of the $time variable
@@ -180,10 +183,9 @@ class Functions extends AbstractController
 				if($date == $date_str) {
 					if($row->getDirection() == "in" && $row->getPunctual() == "no") {
 				
-				        $table .= "<tr>";
-				        $table .= "<td>".$date_str."</td>";
-				        $table .= "<td>".$row->getEmpId()."</td>";
-				        $table .= "<td>".$row->getDirection()."</td>";
+				        $table .= "<tr>";				        				        
+				        $table .= "<td>".$id."</td>";
+				        $table .= "<td>".$emp->getFname()." ".$emp->getLname()."</td>";
 					    $table .= "<td>".$time_str."</td>";
 				        $table .= "</tr>";
 				    }
@@ -196,15 +198,18 @@ class Functions extends AbstractController
 		}
 		
 		else if($type == 'selectEarly') {
-			$date = $request->request->get('date', 'none');
+			$date = $request->request->get('date', 'none');			
 			
 			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+			$empRepo = $this->getDoctrine()->getRepository(Employee::class);
 			$result = $repo->findAll();
 			
-			$table = "<h2>Clocking Data for ".$date."</h2><br>";
-			$table .= "<table><thead><tr><th>Date</th><th>Employee ID</th><th>Direction</th><th>Time</th>";
+			$table = "<h2>Early Leavers on ".$date."</h2><br>";
+			$table .= "<table><thead><tr><th>Employee ID</th><th>Name</th><th>Time</th>";
 			
-			foreach($result as $row) {	
+			foreach($result as $row) {
+				$id = $row->getEmpId();
+			    $emp = $empRepo->findOneBy(['id' => $id]);
 				$time = $row->getTime();			
 				$date_str = $time->format('Y-m-d'); //creates variable using only date part of the $time variable
 				$time_str = $time->format('H:i:s'); //creates variable using only the time part of the $time variable
@@ -212,10 +217,9 @@ class Functions extends AbstractController
 				if($date == $date_str) {
 					if($row->getDirection() == "out" && $row->getPunctual() == "no") {
 				
-				        $table .= "<tr>";
-				        $table .= "<td>".$date_str."</td>";
-				        $table .= "<td>".$row->getEmpId()."</td>";
-				        $table .= "<td>".$row->getDirection()."</td>";
+				        $table .= "<tr>";				        
+				        $table .= "<td>".$id."</td>";
+				        $table .= "<td>".$emp->getFname()." ".$emp->getLname()."</td>";
 					    $table .= "<td>".$time_str."</td>";
 				        $table .= "</tr>";
 				    }
@@ -225,6 +229,156 @@ class Functions extends AbstractController
 			$table .= "</tbody></table>";
 			
 			return new Response($table);	
+		}
+		
+		else if($type == 'create')
+		{			
+			//get the variables
+			$fname = $request->request->get('fname', 'none');
+			$lname = $request->request->get('lname', 'none');
+			$dept = $request->request->get('dept', 'none');
+			
+			//put it in the database
+			$entityManager = $this->getDoctrine()->getManager(); //make a manager
+			
+			$emp = new Employee(); //make object
+			$emp->setFname($fname); 
+			$emp->setLname($lname);
+			$emp->setDept($dept);
+			
+			$entityManager->persist($emp);
+			//execute query and insert into db
+			$entityManager->flush();
+			
+			return new Response("Employee added successfully!");
+		}
+		
+		else if($type == 'update') { 
+			
+			$repository = $this->getDoctrine()->getRepository(Clockings::class);
+            $anomolies = $repository->findAll();
+			
+			//inserted javascript here because wasn't functioning otherwise
+			$table = '<script>
+			          $("[id^=change").click(function(){
+                      console.log("Test");
+                      var id = $(this).attr("clockId");           
+	
+				      $.post( "/functions", { type: "updateRecord", id: id}) 
+					  .done(function(data) {
+				      alert(data);				
+				      document.getElementById("showRecords").click(); //automatically clicks button to refresh this tab				
+				      });    
+				      });	
+					 </script>';
+			
+			$table .= '<table data-role="table"><thead><tr><th>Record ID</th><th>Employee ID</th><th>Date</th><th>Time</th><th>Direction</th><th>Punctual</th></tr></tr></thead><tbody>';
+			
+			foreach($anomolies as $x) {
+				$time = $x->getTime();			
+				$date_str = $time->format('Y-m-d'); //creates variable using only date part of the $time variable
+				$time_str = $time->format('H:i:s');
+				if($x->getPunctual() == "no") {
+				    $table .= "<tr>";
+				    $table .= "<td>".$x->getId()."</td>";
+				    $table .= "<td>".$x->getEmpId()."</td>";
+				    $table .= "<td>".$date_str."</td>";
+					$table .= "<td>".$time_str."</td>";
+				    $table .= "<td>".$x->getDirection()."</td>";
+				    $table .= "<td>".$x->getPunctual()."</td>";				    
+				    $table .= '<td><button id="change'.$x->getId().'" clockId="'.$x->getId().'">Update</button></td>';
+				    $table .= "</tr>";
+				}
+		    }
+			
+			$table .= "</tbody></table>";
+		
+					
+			return new Response($table);
+		}
+		
+		else if($type == 'updateRecord') {
+			$id = $request->request->get('id', 'none'); 
+			
+			$entityManager = $this->getDoctrine()->getManager();
+			
+			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+            $currentid = $repo->findOneBy(['id' => $id]);			
+			
+			$currentid->setPunctual("yes");
+			
+			$entityManager->flush();
+			
+			return new Response("Record Updated!"); 
+		}
+		
+		else if($type == 'updateUnknown') { 
+			
+			$repository = $this->getDoctrine()->getRepository(Clockings::class);
+            $anomolies = $repository->findAll();
+			
+			//inserted javascript here because wasn't functioning otherwise
+			$table = '<script>$("[id^=change").click(function(){
+                      console.log("Test");
+                      var id = $(this).attr("clockId");  
+					  var dir = $( "input[name=dir]:checked" ).val(); //grabs value of checked radio button
+					  var pun = $( "input[name=pun]:checked" ).val(); 
+	
+				      $.post( "/functions", { type: "rectify", id: id, dir: dir, pun: pun }) 
+					  .done(function(data) {
+				      alert(data);				
+				      document.getElementById("showUnknown").click(); //automatically clicks button to refresh this tab				
+				      });    
+				      });	
+					 </script>';
+			
+			$table .= '<table data-role="table"><thead><tr><th>Record ID</th><th>Employee ID</th><th>Date</th><th>Time</th><th>Direction</th><th>Punctual</th></tr></tr></thead><tbody>';
+			
+			foreach($anomolies as $x) {
+				$time = $x->getTime();			
+				$date_str = $time->format('Y-m-d'); //creates variable using only date part of the $time variable
+				$time_str = $time->format('H:i:s');
+				if($x->getPunctual() == "unknown") {
+				    $table .= "<tr>";
+				    $table .= "<td>".$x->getId()."</td>";
+				    $table .= "<td>".$x->getEmpId()."</td>";
+				    $table .= "<td>".$date_str."</td>";
+					$table .= "<td>".$time_str."</td>";
+				    $table .= '<td><fieldset data-role="controlgroup" data-type="horizontal"><input type="radio" name="dir" id="dir1" value="in" checked="checked">
+							   <label for="dir1">In</label>
+							<input type="radio" name="dir" id="dir2" value="out">
+							<label for="dir2">Out</label></td>';
+				    $table .= '<td><fieldset data-role="controlgroup" data-type="horizontal"><input type="radio" name="pun" id="p1" value="yes" checked="checked">
+							   <label for="p1">Yes</label>
+							<input type="radio" name="pun" id="pun2" value="no">
+							<label for="pun2">No</label></td>';			    
+				    $table .= '<td><button id="change'.$x->getId().'" clockId="'.$x->getId().'">Update</button></td>';
+				    $table .= "</tr>";
+				}
+		    }
+			
+			$table .= "</tbody></table>";
+		
+					
+			return new Response($table);
+		}
+		
+		else if($type == 'rectify') {
+			$id = $request->request->get('id', 'none'); 
+			$direction = $request->request->get('dir', 'none'); 
+			$punctual = $request->request->get('pun', 'none'); 
+			
+			$entityManager = $this->getDoctrine()->getManager();
+			
+			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+            $currentid = $repo->findOneBy(['id' => $id]);			
+			
+			$currentid->setDirection($direction);
+			$currentid->setPunctual($punctual);
+			
+			$entityManager->flush();
+			
+			return new Response("Record Updated!"); 
 		}
 	}		
 	
