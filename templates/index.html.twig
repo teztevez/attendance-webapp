@@ -5,15 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Attendance Manager</title>
-    <style> table {
-	border: 1px solid;
-	}
-	
-	tr, td, th {
-	border: 1px solid;
-	padding: .5em;
-	}
-	</style>
+    
 	<link rel="stylesheet" type="text/css" href="css/custom.css"/>
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -22,21 +14,10 @@
 
 <body>
 
-<!-- Start of first page: #one -->
+
 <div data-role="page" id="one">
 	<div role="main" class="ui-content">
-	
-	<h1>Attendance Manager</h1>
-	    <h2>Login</h2>
-	    Username <input type="text" name="username" id="username" value="">
-        Password <input type="password" name="pass" id="pass" value="">
-        <button class="ui-btn" id="loginButton">Submit</button>
-	</div><!-- /content -->
-</div><!-- /page one -->
-
-<div data-role="page" id="dashboard">
-	<div role="main" class="ui-content">
-	<h1>Dashboard</h1>  
+	<h1><img src="images/timekeeping1.jpg"> <br>Dashboard</h1> 
 	<h5 id="date"></h5>
 
     <fieldset class="ui-grid-a">
@@ -54,8 +35,8 @@
 	<div class="ui-block-b"><button type="button" id="update" data-theme="a">Update Records</button></div>	   
     </fieldset>
 	
-	</div><!-- /content -->
-</div><!-- /page one -->
+	</div>
+</div>
 
 <div data-role="page" id="viewAll">
 	<div role="main" class="ui-content">
@@ -64,8 +45,8 @@
 	
 	</div>
 	
-	</div><!-- /content -->
-</div><!-- /page one -->
+	</div>
+</div>
 
 <div data-role="page" id="datePick">
 	<div role="main" class="ui-content">
@@ -83,8 +64,8 @@
 	
 	</div>
 	
-	</div><!-- /content -->
-</div><!-- /page one -->
+	</div>
+</div>
 
 <div data-role="page" id="addNew">
 	<div role="main" class="ui-content">
@@ -93,7 +74,7 @@
 	    First Name: <input type="text" name="fname" id="fname" value="">
         Last Name: <input type="text" name="lname" id="lname" value="">
 	      <form>
-        <fieldset data-role="controlgroup" data-type="horizontal">
+        <fieldset data-role="controlgroup" data-type="horizontal"> <!-- control group to select department -->
         <legend>Department:</legend>
         <input type="radio" name="dept" id="dept1" value="IT" checked="checked">
         <label for="dept1">IT</label>
@@ -140,25 +121,13 @@
 	</div><!-- /content -->
 </div><!-- /page one -->
 <script>
-//login function
-$( "#loginButton" ).click(function() {
-    var uname = $( "#username" ).val();    
-      
-    var pw = $( "#pass" ).val();      
-      
-    $.post( "/functions", { type: "login", username:uname, password:pw})
-    .done(function( data ) {        
-        alert(data);
-        window.location="/index#dashboard";
-        
-    });  
-});
+
 
 //view all clocking data
 $( "#allClock" ).click(function() {      
     $.post( "/functions", { type: "allClock"})
     .done(function( data ) {      
-		window.location="/index#viewAll";
+		window.location="/dashboard#viewAll";
 		$( "#viewTable" ).html(data);	
     });  
 });
@@ -167,31 +136,35 @@ $( "#allClock" ).click(function() {
 $( "#today" ).click(function() {      
     $.post( "/functions", { type: "today"})
     .done(function( data ) {      
-		window.location="/index#viewAll";		
+		window.location="/dashboard#viewAll";		
 		$( "#viewTable" ).html(data);	
     });  
 });
 
+//view onsite report
 $( "#onsite" ).click(function() {      
     $.post( "/functions", { type: "onsite"})
     .done(function( data ) {      
-		window.location="/index#viewAll";		
+		window.location="/dashboard#viewAll";		
 		$( "#viewTable" ).html(data);	
     });  
 });
 
+//if the otherdate button is clicked
 $( "#otherdate" ).click(function() {       
-	window.location="/index#datePick";	    
+	window.location="/dashboard#datePick";	    
 });	
 
+//view report based on selected date
 $( "#viewDate" ).click(function() {      
-    var d = $( "#date-1" ).val();
+    var d = $( "#date-1" ).val(); //creates variable based on selected date
      $.post( "/functions", { type: "selectDate", date: d})   
 		.done(function( data ) {		
 		$( "#viewSpecified" ).html(data);	
 	});	
 });
 
+//function to view late arrivals
 $( "#viewLate" ).click(function() {      
     var d = $( "#date-1" ).val();
      $.post( "/functions", { type: "selectLate", date: d})   
@@ -200,6 +173,7 @@ $( "#viewLate" ).click(function() {
 	});	
 });
 
+//function to view early leavings
 $( "#viewEarly" ).click(function() {      
     var d = $( "#date-1" ).val();
      $.post( "/functions", { type: "selectEarly", date: d})   
@@ -208,10 +182,12 @@ $( "#viewEarly" ).click(function() {
 	});	
 });
 
+//navigate to create employee form
 $( "#create" ).click(function() {       
-	window.location="/index#addNew";	    
+	window.location="/dashboard#addNew";	    
 });	
 
+//function to create employees
 $( "#submitEmp" ).click(function() { 
     var fn = $( "#fname" ).val(); 
       
@@ -222,14 +198,16 @@ $( "#submitEmp" ).click(function() {
 	$.post( "/functions", { type: "create", fname:fn, lname:ln, dept:dept})
     .done(function( data ) {
         alert(data);	
-		location.reload();
+		location.reload(); //refreshes the page
     });
 });
 
+//navigate to page to view reports
 $( "#update" ).click(function() {       
-	window.location="/index#updateRecords";	    
+	window.location="/dashboard#updateRecords";	    
 });	
 
+//function to show poor punctual records
 $( "#showRecords" ).click(function() {   
     $.post( "/functions", { type: "update"})
     .done(function( data ) {	
@@ -237,6 +215,7 @@ $( "#showRecords" ).click(function() {
 	});
 });
 
+//function to show unknown records
 $( "#showUnknown" ).click(function() {   
     $.post( "/functions", { type: "updateUnknown"})
     .done(function( data ) {	
@@ -244,8 +223,7 @@ $( "#showUnknown" ).click(function() {
 	});
 });
 
-showUnknown
-	
+//displays date on manager dashboard	
 var date = Date();
 document.getElementById("date").innerHTML = date;
 

@@ -91,6 +91,7 @@ class Functions extends AbstractController
 			return new Response($table);	
 		}		
 		
+		//function to gather data for onsite report
 		else if($type == 'onsite') {
 			$date = date("d/m/Y"); //today's date
 			
@@ -132,7 +133,8 @@ class Functions extends AbstractController
 			return new Response($table);
 							
 		}		
-	
+		
+		//function to gather data for selected date
 	    else if($type == 'selectDate') {
 			$date = $request->request->get('date', 'none');
 			
@@ -163,6 +165,7 @@ class Functions extends AbstractController
 			return new Response($table);	
 		}
 		
+		//function to show late arrivals
 		else if($type == 'selectLate') {
 			$date = $request->request->get('date', 'none');
 			
@@ -197,6 +200,7 @@ class Functions extends AbstractController
 			return new Response($table);	
 		}
 		
+		//function to display early leavings
 		else if($type == 'selectEarly') {
 			$date = $request->request->get('date', 'none');			
 			
@@ -231,6 +235,7 @@ class Functions extends AbstractController
 			return new Response($table);	
 		}
 		
+		//function to create new employees
 		else if($type == 'create')
 		{			
 			//get the variables
@@ -253,6 +258,7 @@ class Functions extends AbstractController
 			return new Response("Employee added successfully!");
 		}
 		
+		//function to update records
 		else if($type == 'update') { 
 			
 			$repository = $this->getDoctrine()->getRepository(Clockings::class);
@@ -297,6 +303,7 @@ class Functions extends AbstractController
 			return new Response($table);
 		}
 		
+		//function to commit change to the database
 		else if($type == 'updateRecord') {
 			$id = $request->request->get('id', 'none'); 
 			
@@ -312,6 +319,7 @@ class Functions extends AbstractController
 			return new Response("Record Updated!"); 
 		}
 		
+		//function to update unknown records
 		else if($type == 'updateUnknown') { 
 			
 			$repository = $this->getDoctrine()->getRepository(Clockings::class);
@@ -332,7 +340,7 @@ class Functions extends AbstractController
 				      });	
 					 </script>';
 			
-			$table .= '<table data-role="table"><thead><tr><th>Record ID</th><th>Employee ID</th><th>Date</th><th>Time</th><th>Direction</th><th>Punctual</th></tr></tr></thead><tbody>';
+			$table .= '<table data-role="table"><thead><tr><th>Record ID</th><th>Employee ID</th><th>Date</th><th>Time</th><th>Direction</th><th>Punctual</th><th>Update</th></tr></tr></thead><tbody>';
 			
 			foreach($anomolies as $x) {
 				$time = $x->getTime();			
@@ -344,13 +352,13 @@ class Functions extends AbstractController
 				    $table .= "<td>".$x->getEmpId()."</td>";
 				    $table .= "<td>".$date_str."</td>";
 					$table .= "<td>".$time_str."</td>";
-				    $table .= '<td><fieldset data-role="controlgroup" data-type="horizontal"><input type="radio" name="dir" id="dir1" value="in" checked="checked">
+				    $table .= '<td><fieldset data-role="controlgroup" data-type="horizontal"><input type="radio" name="dir" value="in" checked="checked">
 							   <label for="dir1">In</label>
-							<input type="radio" name="dir" id="dir2" value="out">
+							<input type="radio" name="dir" value="out">
 							<label for="dir2">Out</label></td>';
-				    $table .= '<td><fieldset data-role="controlgroup" data-type="horizontal"><input type="radio" name="pun" id="p1" value="yes" checked="checked">
+				    $table .= '<td><fieldset data-role="controlgroup" data-type="horizontal"><input type="radio" name="pun" value="yes" checked="checked">
 							   <label for="p1">Yes</label>
-							<input type="radio" name="pun" id="pun2" value="no">
+							<input type="radio" name="pun" value="no">
 							<label for="pun2">No</label></td>';			    
 				    $table .= '<td><button id="change'.$x->getId().'" clockId="'.$x->getId().'">Update</button></td>';
 				    $table .= "</tr>";
@@ -363,6 +371,7 @@ class Functions extends AbstractController
 			return new Response($table);
 		}
 		
+		//function to commit changes based on function above
 		else if($type == 'rectify') {
 			$id = $request->request->get('id', 'none'); 
 			$direction = $request->request->get('dir', 'none'); 
@@ -382,6 +391,7 @@ class Functions extends AbstractController
 		}
 	}		
 	
+	//function called in previous onsite function
 	public function haveLeft($id) {	
 		$date = date("d/m/Y"); //today's date
 		$request = Request::createFromGlobals(); 
