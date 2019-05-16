@@ -43,8 +43,14 @@ class LoginController extends AbstractController
 	/**
 	* @Route("/dashboard", name="dashboard")
 	*/
-	public function dashboard()
+	public function dashboard(SessionInterface $session)
 	{
-		return $this->render('index.html.twig');
+		if($session->get('auth') == "1") {
+			
+		    return $this->render('index.html.twig');
+		}
+		else{
+			return $this->redirectToRoute('index', ['error' => '*** You must be logged in to view the dashboard! ***']);                    
+                } 
 	}   
 }

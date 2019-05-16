@@ -250,6 +250,7 @@ class Functions extends AbstractController
 			$emp->setFname($fname); 
 			$emp->setLname($lname);
 			$emp->setDept($dept);
+			$emp->setStatus("active");
 			
 			$entityManager->persist($emp);
 			//execute query and insert into db
@@ -420,54 +421,66 @@ class Functions extends AbstractController
 	/**
 	* @Route("/stats", name="stats")
 	*/
-	public function stats()
+	public function stats(SessionInterface $session)
 	{
-		return $this->render('stats.html.twig');
+		if($session->get('auth') == "1") {
+			
+		    return $this->render('stats.html.twig');
+		}
+		else {
+			return $this->redirectToRoute('index', ['error' => '*** You must be logged in to view the dashboard! ***']);
+		}
+			
 	}
 	
 	/**
 	* @Route("/punctual-or-not", name="punctual-or-not")
 	*/
-	public function punctual_or_not()
+	public function punctual_or_not(SessionInterface $session)
 	{
-		$repo = $this->getDoctrine()->getRepository(Clockings::class);
-		$all = $repo->findAll();
+		if($session->get('auth') == "1") {
+			$repo = $this->getDoctrine()->getRepository(Clockings::class);
+			$all = $repo->findAll();
 		
-		$tardy = 0; //overall figures for non-punctual
-		$punctual = 0; //overall figures for punctual
-		$unknown = 0; //overall figures for unknown directions
-		$p_arrival = 0; //punctual arrival figures
-		$t_arrival = 0; //tardy arrival figures
-		$p_leave = 0; //punctual leaving figures
-		$t_leave = 0; //tardy leaving figures
+			$tardy = 0; //overall figures for non-punctual
+			$punctual = 0; //overall figures for punctual
+			$unknown = 0; //overall figures for unknown directions
+			$p_arrival = 0; //punctual arrival figures
+			$t_arrival = 0; //tardy arrival figures
+			$p_leave = 0; //punctual leaving figures
+			$t_leave = 0; //tardy leaving figures
 		
-		foreach($all as $row) {
-			if($row->getPunctual() == "yes") { //if record is punctual
-				$punctual++;
-				if($row->getDirection() == "in") {
-					$p_arrival++; //if direction is "in", mark punctual arrival as +1
+			foreach($all as $row) {
+				if($row->getPunctual() == "yes") { //if record is punctual
+					$punctual++;
+					if($row->getDirection() == "in") {
+						$p_arrival++; //if direction is "in", mark punctual arrival as +1
+					}
+					else{
+						$p_leave++;
+					}
 				}
-				else{
-					$p_leave++;
+				else if($row->getPunctual() == "no") {
+					$tardy++;
+					if($row->getDirection() == "in") {
+						$t_arrival++;
+					}
+					else{
+						$t_leave++;
+					}
+				}
+				else {
+					$unknown++;
 				}
 			}
-			else if($row->getPunctual() == "no") {
-				$tardy++;
-				if($row->getDirection() == "in") {
-					$t_arrival++;
-				}
-				else{
-					$t_leave++;
-				}
-			}
-			else {
-				$unknown++;
-			}
+		
+			$stats = [$punctual, $tardy, $unknown, $p_arrival, $t_arrival, $p_leave, $t_leave]; //array of various stats
+		
+			return $this->render('punctual.html.twig', array("stats" => $stats));
 		}
-		
-		$stats = [$punctual, $tardy, $unknown, $p_arrival, $t_arrival, $p_leave, $t_leave]; //array of various stats
-		
-		return $this->render('punctual.html.twig', array("stats" => $stats));
+		else {
+			return $this->redirectToRoute('index', ['error' => '*** You must be logged in to view the dashboard! ***']);
+		}
 	}
 	
 	/**
@@ -487,13 +500,20 @@ class Functions extends AbstractController
 	/**
 	* @Route("/emp", name="emp")
 	*/
-	public function emp()
+	public function emp(SessionInterface $session)
 	{
-		$repo = $this->getDoctrine()->getRepository(Employee::class);
-		$all = $repo->findAll();		
+		if($session->get('auth') == "1") {
+			
+		    $repo = $this->getDoctrine()->getRepository(Employee::class);
+		    $all = $repo->findAll();		
 		
 		
-		return $this->render('emp.html.twig', array("all" => $all));
+		    return $this->render('emp.html.twig', array("all" => $all));
+		}
+		else {
+			return $this->redirectToRoute('index', ['error' => '*** You must be logged in to view the dashboard! ***']);
+		}
+			
 	}
 	
 	/**
@@ -562,13 +582,17 @@ class Functions extends AbstractController
 	/**
 	* @Route("/status", name="status")
 	*/
-	public function status()
+	public function status(SessionInterface $session)
 	{
-		$repo = $this->getDoctrine()->getRepository(Employee::class);
-		$all = $repo->findAll();		
+		if($session->get('auth') == "1") {
+		    $repo = $this->getDoctrine()->getRepository(Employee::class);
+		    $all = $repo->findAll();			
 		
-		
-		return $this->render('status.html.twig', array("all" => $all));
+		    return $this->render('status.html.twig', array("all" => $all));
+		}
+		else {
+			return $this->redirectToRoute('index', ['error' => '*** You must be logged in to view the dashboard! ***']);
+		}
 	}
 	
 	/**
