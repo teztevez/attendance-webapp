@@ -31,6 +31,11 @@ class Employee
      */
     private $dept;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $Status;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -68,6 +73,18 @@ class Employee
     public function setDept(string $dept): self
     {
         $this->dept = $dept;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->Status;
+    }
+
+    public function setStatus(string $Status): self
+    {
+        $this->Status = $Status;
 
         return $this;
     }

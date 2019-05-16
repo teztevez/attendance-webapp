@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Punctual Stats</title>
+	<link rel="stylesheet" type="text/css" href="css/custom.css"/>
+	<script src="https://www.chartjs.org/dist/2.8.0/Chart.min.js"></script>
+	<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+	<style>
+	<!-- canvas{ -->
+		<!-- -moz-user-select: none; -->
+		<!-- -webkit-user-select: none; -->
+		<!-- -ms-user-select: none; -->
+	<!-- } -->
+	
+	
+	</style>
+</head>
+
+<body>
+   
+	
+	<div class="container">		
+			<div class='row'>
+				<div class='column1'>
+				<h1>Total Figures</h1>
+					<canvas id="canvas1"></canvas>
+				</div>
+				
+				<div class='column2'>
+				<h1>Direction Breakdown</h1>
+					<canvas id="canvas"></canvas>
+				</div>	
+			
+		</div>
+		
+	</div>
+	
+	<script>
+	
+
+		var pieconfig = {
+			type: 'pie',
+			data: {
+				datasets: [{
+					data: [
+						{{stats[0]}},
+						{{stats[1]}},
+						{{stats[2]}},
+						
+					],
+					backgroundColor: [										
+						window.chartColors.green,	
+						window.chartColors.red,	
+						window.chartColors.gray,
+					],
+					label: 'Dataset 1'
+				}],
+				labels: [
+					'Punctual',
+					'Tardy',
+					'Unknown'
+				]
+			},
+			options: {
+				responsive: true
+			}
+		};		
+		
+	
+
+		
+	</script>
+	
+	
+	<script>
+		
+		var color = Chart.helpers.color;
+		var barChartData = {			
+			datasets: [{
+				label: 'Punctual Entries',
+				backgroundColor: color(window.chartColors.green).alpha(0.5).rgbString(),
+				borderColor: window.chartColors.green,
+				borderWidth: 1,
+				data: [
+					{{stats[3]}}					
+				]
+			}, {
+				label: 'Tardy Entries',
+				backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+				borderColor: window.chartColors.red,
+				borderWidth: 1,
+				data: [					
+					{{stats[4]}}					
+				]
+			}, {
+				label: 'Punctual Exits',
+				backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+				borderColor: window.chartColors.blue,
+				borderWidth: 1,
+				data: [					
+					{{stats[5]}}					
+				]
+			}, {
+				label: 'Tardy Exits',
+				backgroundColor: color(window.chartColors.orange).alpha(0.5).rgbString(),
+				borderColor: window.chartColors.orange,
+				borderWidth: 1,
+				data: [					
+					{{stats[6]}}					
+				]
+			},{
+				label: 'Unknown Interactions',
+				backgroundColor: color(window.chartColors.gray).alpha(0.5).rgbString(),
+				borderColor: window.chartColors.gray,
+				borderWidth: 1,
+				data: [					
+					{{stats[2]}}
+				]
+			}]
+			
+			
+
+		};
+
+		window.onload = function() {
+		    var ct1 = document.getElementById('canvas1').getContext('2d');
+			window.myPie1 = new Chart(ct1, pieconfig);
+			
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myBar = new Chart(ctx, {
+				type: 'bar',
+				data: barChartData,
+				options: {
+					responsive: true,
+					legend: {
+						position: 'top',
+					},
+					title: {
+						display: false,
+						text: 'Chart.js Bar Chart'
+					}
+				}
+			});
+
+		};
+
+		
+
+		var colorNames = Object.keys(window.chartColors);
+		
+		
+
+		
+
+		
+	</script>
+	
+	
+</body>
+
+</html>

@@ -389,7 +389,9 @@ class Functions extends AbstractController
 			
 			return new Response("Record Updated!"); 
 		}
-	}		
+	}
+
+		
 	
 	//function called in previous onsite function
 	public function haveLeft($id) {	
@@ -414,6 +416,185 @@ class Functions extends AbstractController
 			}
 		}		
 	}
+	
+	/**
+	* @Route("/stats", name="stats")
+	*/
+	public function stats()
+	{
+		return $this->render('stats.html.twig');
+	}
+	
+	/**
+	* @Route("/punctual-or-not", name="punctual-or-not")
+	*/
+	public function punctual_or_not()
+	{
+		$repo = $this->getDoctrine()->getRepository(Clockings::class);
+		$all = $repo->findAll();
+		
+		$tardy = 0; //overall figures for non-punctual
+		$punctual = 0; //overall figures for punctual
+		$unknown = 0; //overall figures for unknown directions
+		$p_arrival = 0; //punctual arrival figures
+		$t_arrival = 0; //tardy arrival figures
+		$p_leave = 0; //punctual leaving figures
+		$t_leave = 0; //tardy leaving figures
+		
+		foreach($all as $row) {
+			if($row->getPunctual() == "yes") { //if record is punctual
+				$punctual++;
+				if($row->getDirection() == "in") {
+					$p_arrival++; //if direction is "in", mark punctual arrival as +1
+				}
+				else{
+					$p_leave++;
+				}
+			}
+			else if($row->getPunctual() == "no") {
+				$tardy++;
+				if($row->getDirection() == "in") {
+					$t_arrival++;
+				}
+				else{
+					$t_leave++;
+				}
+			}
+			else {
+				$unknown++;
+			}
+		}
+		
+		$stats = [$punctual, $tardy, $unknown, $p_arrival, $t_arrival, $p_leave, $t_leave]; //array of various stats
+		
+		return $this->render('punctual.html.twig', array("stats" => $stats));
+	}
+	
+	/**
+	* @Route("/range", name="range")
+	*/
+	//public function range()
+	//{
+	//	$repo = $this->getDoctrine()->getRepository(Clockings::class);
+	//	$all = $repo->findAll();
+		
+		
+		
+		
+	//	return $this->render('range.html.twig', array("all" => $all));
+	//}
+	
+	/**
+	* @Route("/emp", name="emp")
+	*/
+	public function emp()
+	{
+		$repo = $this->getDoctrine()->getRepository(Employee::class);
+		$all = $repo->findAll();		
+		
+		
+		return $this->render('emp.html.twig', array("all" => $all));
+	}
+	
+	/**
+	* @Route("/empstat", name="empstat")
+	*/
+	public function empstat()
+	{
+		$request = Request::createFromGlobals(); 
+		
+		$id = $request->request->get('id', 'none');	
+		
+		
+		$repo = $this->getDoctrine()->getRepository(Clockings::class);
+		$emp = $repo->findBy(['emp_id' => $id]);
+		$repo1 = $this->getDoctrine()->getRepository(Employee::class);
+		$name = $repo1->findOneBy(['id' => $id]);
+		$fname = $name->getFname();
+		$lname = $name->getLname();
+		
+		$punctual = 0; 
+		$tardy = 0;
+		$unknown = 0;
+		$total = 0;
+		$p_entry = 0;
+		$t_entry = 0;
+		$p_exit = 0;
+		$t_exit = 0;		
+		$stat = "";
+		
+		foreach ($emp as $row) {
+			$total++;
+			if($row->getPunctual() == "yes") {
+				$punctual++;
+				if($row->getDirection() == "in") {
+					$p_entry++;
+				}
+				else {
+					$p_exit++;
+				}
+			}
+			else {
+				$tardy++;
+				if($row->getDirection() == "in") {
+					$t_entry++;
+				}
+				else {
+					$t_exit++;
+				}
+			}				
+		}
+		$stat.= "<h1>Stats for ".$fname." ".$lname."</h1>";
+		$stat.= "<table>";
+		$stat.= "<tr><td>Total Interactions:</td><td>".$total."</td></tr>";
+		$stat.= "<tr><td>Total Punctual:</td><td>".$punctual."</td></tr>";
+		$stat.= "<tr><td>Total Tardy:</td><td>".$tardy."</td></tr>";
+		$stat.= "<tr><td>Punctual Entries:</td><td>".$p_entry."</td></tr>";
+		$stat.= "<tr><td>Tardy Entries:</td><td>".$t_entry."</td></tr>";
+		$stat.= "<tr><td>Punctual Exits:</td><td>".$p_exit."</td></tr>";
+		$stat.= "<tr><td>Tardy Exits:</td><td>".$t_exit."</td></tr>";
+		$stat.= "<tr><td>Unknown Interactions:</td><td>".$unknown."</td></tr>";
+		$stat.= "</table>";
+		
+		return new Response($stat);
+	}
+	
+	/**
+	* @Route("/status", name="status")
+	*/
+	public function status()
+	{
+		$repo = $this->getDoctrine()->getRepository(Employee::class);
+		$all = $repo->findAll();		
+		
+		
+		return $this->render('status.html.twig', array("all" => $all));
+	}
+	
+	/**
+	* @Route("/updatestatus", name="updatestatus")
+	*/
+	public function updatestatus()
+	{
+		$entityManager = $this->getDoctrine()->getManager();
+		$request = Request::createFromGlobals(); 		
+		$id = $request->request->get('id', 'none');
+		
+		$repo = $this->getDoctrine()->getRepository(Employee::class);
+		$emp = $repo->findOneBy(['id' => $id]);		
+		
+		if($emp->getStatus() == "active") {			
+			$emp->setStatus("inactive");
+		}
+		else {
+			$emp->setStatus("active");
+		}			
+			$entityManager->flush();
+		
+		return new Response("Status Changed!");
+	}
+	
+	
 	
 	
 }

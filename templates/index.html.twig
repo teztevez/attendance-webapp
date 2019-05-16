@@ -35,6 +35,11 @@
 	<div class="ui-block-b"><button type="button" id="update" data-theme="a">Update Records</button></div>	   
     </fieldset>
 	
+	<fieldset class="ui-grid-a">
+	<div class="ui-block-a"><button type="button" id="stats" data-theme="a">View Statistics</button></div>
+	<div class="ui-block-b"><button type="button" id="status" data-theme="a">Update Employee Status</button></div>	   
+    </fieldset>
+	
 	</div>
 </div>
 
@@ -118,8 +123,9 @@
 	
 	    
 	
-	</div><!-- /content -->
-</div><!-- /page one -->
+	</div>
+</div>
+
 <script>
 
 
@@ -135,7 +141,8 @@ $( "#allClock" ).click(function() {
 //view today's clocking data
 $( "#today" ).click(function() {      
     $.post( "/functions", { type: "today"})
-    .done(function( data ) {      
+    .done(function( data ) {   
+		console.log(data);
 		window.location="/dashboard#viewAll";		
 		$( "#viewTable" ).html(data);	
     });  
@@ -222,6 +229,16 @@ $( "#showUnknown" ).click(function() {
     $( "#viewAnomolies" ).html(data);	
 	});
 });
+
+$( "#stats" ).click(function() {       
+	window.location="/stats";	    
+});	
+
+$( "#status" ).click(function() {       
+	window.location="/status";	    
+});	
+
+
 
 //displays date on manager dashboard	
 var date = Date();

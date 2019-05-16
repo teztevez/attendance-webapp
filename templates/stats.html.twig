@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Attendance Manager</title>
+    
+	<link rel="stylesheet" type="text/css" href="css/custom.css"/>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>	
+</head>
+
+<body>
+	
+<div data-role="page" id="viewStats">
+	<div role="main" class="ui-content">
+	<h2>Statistics:</h2>  
+	
+	<form>        
+		<button type="button" id="punctual" data-theme="a">Punctual vs Non-Punctual Stats</button>	
+		<button type="button" id="emp" data-theme="a">Employee Stats</button>	
+    </form>
+	
+	
+	    
+	
+	</div>
+</div>
+<script>
+$( "#punctual" ).click(function() {      
+    window.location="/punctual-or-not";   
+});
+
+$( "#emp" ).click(function() {      
+    window.location="/emp";   
+});
+</script>
+</body>
+</html>
